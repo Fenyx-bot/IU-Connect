@@ -9,10 +9,10 @@ class ChatBubble extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.black,
+        color: Theme.of(context).colorScheme.secondary,
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Text(message, style: const TextStyle(color: Colors.white, fontSize: 16),),
+      child: Text(message, style: TextStyle(color: Theme.of(context).appBarTheme.titleTextStyle!.color, fontSize: 16),),
     );
   }
 }

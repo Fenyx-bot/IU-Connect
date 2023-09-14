@@ -1,9 +1,7 @@
 //import 'package:chatting/pages/ProfilePage.dart';
-import 'package:chatting/services/auth/auth_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import 'ChatPage.dart';
 
@@ -25,21 +23,19 @@ class _FriendsPageState extends State<FriendsPage> {
     idex = currentIndex;
   }
 
-  //sign out function
-  void signOut() {
-    //get auth service
-    final authService = Provider.of<AuthService>(context, listen: false);
-
-    authService.signOut();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[300],
+      backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
-        backgroundColor: Colors.black,
-        title: const Center(child: Text('IU Friends', style: TextStyle(color: Colors.white),)),
+        title: Row(children: [
+            const Icon(Icons.people),
+            const SizedBox(width: 10,),
+            const Center(child: Text('F R I E N D S')),
+            const Expanded(child: SizedBox(width: 10,)),
+            IconButton(onPressed: () {}, icon: const Icon(Icons.person_add_rounded),)
+          ],
+        ),
       ),
       body: _buildUserList(),
     );
@@ -71,14 +67,21 @@ class _FriendsPageState extends State<FriendsPage> {
     Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
 
     //display all users except for the current user logged in
-    if(_auth.currentUser!.email != data['email']){
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 25.0),
-        child: ListTile(
-          tileColor: Colors.grey[200],
-          shape: RoundedRectangleBorder(side: BorderSide(width: 2), borderRadius: BorderRadius.circular(12)),
+    if(_auth.currentUser!.uid != data['uid']){
+      return Container(
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          decoration: BoxDecoration(
+            border: Border(bottom: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.5))
+          ),
+          child:
+            ListTile(
+          tileColor: Theme.of(context).colorScheme.background,
+          leading: CircleAvatar(
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            child: Text(data['username'][0].toUpperCase(), style: TextStyle(color: Theme.of(context).appBarTheme.titleTextStyle!.color), ),
+          ),
 
-          title: Center(child: Text(data['username'])),
+          title: Text(data['username']),
           onTap: () {
             //pass to the chat page with this current user6
             Navigator.push(context, MaterialPageRoute(builder: (context) => ChatPage(
@@ -87,7 +90,9 @@ class _FriendsPageState extends State<FriendsPage> {
             ),),);
           },
         ),
-      );
+          
+        );
+
     }else{
       //return empty container
       return Container();

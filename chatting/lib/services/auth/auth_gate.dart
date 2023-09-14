@@ -1,4 +1,4 @@
-import 'package:chatting/pages/NavStateController.dart';
+import 'package:chatting/pages/HomePage.dart';
 import 'package:chatting/services/auth/LoginOrRegister.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +14,7 @@ class AuthGate extends StatelessWidget {
        builder: (context, snapshot){
         //user is logged in
         if(snapshot.hasData) {
-          return NavStateController();
+          return const HomePage();
         }
         //user is not logged in
         else{

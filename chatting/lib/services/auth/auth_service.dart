@@ -20,6 +20,9 @@ class AuthService extends ChangeNotifier{
       _firestore.collection('users').doc(userCredential.user!.uid).set({
         'uid' : userCredential.user!.uid,
         'email' : email,
+        'username' : email.split("@")[0],
+        "bio" : "my bio",
+        "pronouns" : "",
       }, SetOptions(merge: true));
 
 
@@ -33,16 +36,18 @@ class AuthService extends ChangeNotifier{
   }
 
   //create new user
-  Future<UserCredential> signUpWithEmailandPassword(String username, String email, String password) async{
+  Future<UserCredential> signUpWithEmailandPassword(String email, String password) async{
     try{
       UserCredential userCredential = await _firebaseAuth.createUserWithEmailAndPassword(email: email, password: password);
-      _firebaseAuth.currentUser!.updateDisplayName(username);
+      _firebaseAuth.currentUser!.updateDisplayName(email.split("@")[0]);
 
       //after creating user, create new document for the user in the users collection
       _firestore.collection('users').doc(userCredential.user!.uid).set({
         'uid' : userCredential.user!.uid,
-        'username' : username,
         'email' : email,
+        'username' : email.split("@")[0],
+        "bio" : "my bio",
+        "pronouns" : "",
       });
 
       return userCredential;

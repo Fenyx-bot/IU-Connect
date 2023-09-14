@@ -18,7 +18,10 @@ class _ChatPageState extends State<ChatPage> {
   final TextEditingController _messageController = TextEditingController();
   final ChatService _chatService = ChatService();
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  Icon _sendIcon = Icon(Icons.arrow_circle_right, color: Colors.black,);
+
+
+  final ScrollController _scrollController = ScrollController();
+  final bool InitialScroll = true;
 
   void sendMessage() async {
     if(_messageController.text.isNotEmpty){ // only send a message if the message controller is not empty
@@ -33,14 +36,16 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar:  AppBar(
-        backgroundColor: Colors.black,
         title: Text(widget.receiverUsername),
       ),
-      backgroundColor: Colors.grey[300],
+      backgroundColor: Theme.of(context).colorScheme.background,
       body: Column(
         children: [
           //messages
           Expanded(child: _buildMessagesList()), 
+          
+          const SizedBox(height: 15,),
+
           //user input
           _buildMessagesInput(),
 
@@ -63,7 +68,15 @@ class _ChatPageState extends State<ChatPage> {
           return const Text('Loading..');
         }
 
+        if(snapshot.hasData){
+          if(InitialScroll){
+            WidgetsBinding.instance.addPostFrameCallback((_) => _scrollController.jumpTo(_scrollController.position.maxScrollExtent));
+          }
+
+        }
+
         return ListView(
+          controller: _scrollController,
           children: snapshot.data!.docs.map((document) => _buildMessageItem(document)).toList(),
           );
       },
@@ -113,25 +126,19 @@ class _ChatPageState extends State<ChatPage> {
           Expanded(child: TextField(
             controller: _messageController,
             decoration: InputDecoration(
-            suffixIcon: IconButton(icon: _sendIcon, onPressed: sendMessage),
+            suffixIcon: IconButton(icon: Icon(Icons.arrow_circle_right, color: Theme.of(context).appBarTheme.iconTheme!.color,), onPressed: sendMessage),
             hintText: 'Send a message',
             enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Colors.grey.shade200),
             borderRadius: BorderRadius.circular(15.0)
             ),
-            focusedBorder: const OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.white, )
+            focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Theme.of(context).colorScheme.secondary, ),
+            borderRadius: const BorderRadius.all(Radius.circular(15.0))
             ),
-            fillColor: Colors.grey[100],
+            fillColor: Theme.of(context).colorScheme.primary,
             filled: true,
-            hintStyle: const TextStyle(color: Colors.black45),),
-            onChanged: (args) {
-              if(_messageController.text.isNotEmpty){
-                _sendIcon = Icon(Icons.arrow_right_alt_rounded, color: Colors.grey[800],);
-              }else{
-                _sendIcon = Icon(Icons.menu, color: Colors.grey[800],);
-              }
-            },
+            hintStyle: TextStyle(color: Theme.of(context).colorScheme.secondary),),
     )),
         ],
       ),
